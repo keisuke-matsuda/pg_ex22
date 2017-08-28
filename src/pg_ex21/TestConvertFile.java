@@ -10,17 +10,17 @@ public class TestConvertFile {
 
 	@Test
 	public void testCalcMain() {
-		String charge_ff = ConvertFile.calcBase(false, false);
-		assertEquals("1000",charge_ff);
+		int charge_ff = ConvertFile.calcBase(false, false);
+		assertEquals(1000,charge_ff);
 
-		String charge_tf = ConvertFile.calcBase(true, false);
-		assertEquals("1100",charge_tf);
+		int charge_tf = ConvertFile.calcBase(true, false);
+		assertEquals(1100,charge_tf);
 
-		String charge_ft = ConvertFile.calcBase(false,true);
-		assertEquals("1200",charge_ft);
+		int charge_ft = ConvertFile.calcBase(false,true);
+		assertEquals(1200,charge_ft);
 
-		String charge_tt = ConvertFile.calcBase(true, true);
-		assertEquals("1300",charge_tt);
+		int charge_tt = ConvertFile.calcBase(true, true);
+		assertEquals(1300,charge_tt);
 	}
 
 	@Test

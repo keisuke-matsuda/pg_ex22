@@ -25,27 +25,26 @@ public class ConvertFile {
 		BufferedWriter bw = new BufferedWriter(new FileWriter(reqfile,true));
 
 		String line = null;
+
 		ArrayList<String> nums_c1 = new ArrayList<String>() ;
 		ArrayList<Integer> times_call = new ArrayList<Integer>(); //とりあえずInteger型でいく。Date型にするとかは別途検討
-
 		boolean yes_c1 = false;
 		boolean yes_e1 = false;
 		String phone_num = null;
-		String base_charge = null;	//int型の方がよい??
+		int sum_base_charge = 0;
 		int sum_charge_call = 0;
 
 
 		while ((line = br.readLine()) != null){
-//			bw.write(line+"\n");
-			char type = line.charAt(0);
+			char head = line.charAt(0);
 
-			switch (type){
+			switch (head){
 			case '1' :
+				//契約者の電話番号を抽出
 				phone_num = line.substring(2,15);
 				break;
 			case '2' :
-				//割引関連の情報を変数に代入する
-				//各サービスに加入しているか?
+				//割引関連の情報を変数に代入
 				if (line.contains("C1")){
 					yes_c1 = true;
 					nums_c1.add(line.substring(5,18));
@@ -56,100 +55,103 @@ public class ConvertFile {
 				}
 				break;
 			case '5' :
+				 	//通話時間を抽出してint型に整形
 					String time_unform = (line.substring(13,18));
 					int time_start = Integer.parseInt(time_unform.substring(0, 2)+time_unform.substring(3,5));
-					String num_call = line.substring(23,36);
-					int time_call = Integer.parseInt(line.substring(19,22));
-					//配列にする必要ある?times_call.add(Integer.parseInt(time_formed));
 
+					//通話先の電話番号を抽出
+					String num_call = line.substring(23,36);
+
+					//通話時間を抽出
+					int time_call = Integer.parseInt(line.substring(19,22));
+
+					//calcCallメソッドから1回あたりの通話料金を受け取る
 					int charge_call = calcCall(yes_c1,yes_e1,time_start,time_call,num_call,nums_c1);
+
+					//契約者毎の通話料金の合計を求める
 					sum_charge_call += charge_call;
 					break;
 			case '9' :
 				//計算メソッドを利用して、基本料金を計算する
-				base_charge = calcBase(yes_c1,yes_e1);
+				sum_base_charge = calcBase(yes_c1,yes_e1);
 
-				bw.write(phone_num+"\n"); 	//とりあえず代理の書き込み
-				bw.write(base_charge+"\n");		//とりあえず代理の書き込み
-				bw.write(sum_charge_call+"\n");	//とりあえず代理の書き込み
-				bw.write(secline+"\n");		//とりあえず代理の書き込み
-				//書き込みメソッドを作成してここに入れる
+				//請求ファイルに書き込み
+				if ( phone_num != null){
+				bw.write("1 "+phone_num+"\n");
+				bw.write("5 "+sum_base_charge+"\n");
+				bw.write("7 "+sum_charge_call+"\n");
+				bw.write("9 "+secline+"\n");
+				}
 
-//				for (int s : times_call){
-//				System.out.println(s);
-//				}
-
-
-				yes_c1 = false;				//とりえあず代理の初期化(メソッド作成後に削除)
-				yes_e1 = false;			//とりあえず代理の初期化(メソッド作成後に削除)
-				sum_charge_call = 0;	//とりあえず代理の初期化(メソッド作成後に削除)
-				nums_c1.clear();		//とりあえず代理の初期化(メソッド作成後に削除)
-				times_call.clear(); 	//とりあえず代理の初期化(メソッド作成後に削除)
-				//変数を初期化するメソッドを作成してここにいれる
+				//変数、配列の初期化
+				yes_c1 = false;
+				yes_e1 = false;
+				sum_charge_call = 0;
+				nums_c1.clear();
+				times_call.clear();
 				break;
 			}
-	}
-
-//		System.out.println(nums_c1.size());
+		}
 		br.close();
 		bw.close();
-
-//		String test_teststring = "5 2004/06/04 03:34 003 090-1234-0002";
-//		String test_time_unform = (test_teststring.substring(13,18));
-//		System.out.println(test_time_unform);
-//		String test_time_formed = test_time_unform.substring(0, 2) + test_time_unform.substring(3,5);
-//		System.out.println(test_time_formed);
-
 	}
 
-	//戻り値は基本料金(int型)、引数はyes_c1,yes_e1,
-	static String calcBase(boolean yes_c1,boolean yes_e1){
+
+	static int calcBase(boolean yes_c1,boolean yes_e1){
+		//契約者毎の基本料金を求めるメソッド
 		int charge_base = basecharge;
 		if (yes_c1 == true){
 			charge_base += 100;
-		}
-
-		if (yes_e1 == true){
+		}else if (yes_e1 == true){
 			charge_base += 200;
 		}
-		return String.valueOf(charge_base);
+		return charge_base;
 
 	}
 
 	static int calcCall(boolean yes_c1,boolean yes_e1,int time_start,int time_call,String num_call,ArrayList<String> nums_c1){
+		//通話1回あたりの通話料金を求める
 		int charge_call = 0;
+		int no_serv = callcharge*time_call;	//どのサービスにも該当しない場合の計算式
 
+		//加入サービス毎に場合分けして、通話料金を求める
 		if (yes_c1 == false && yes_e1 == false){
-			charge_call += callcharge*time_call;		//重複してる1
+			//加入者がどのサービスにも加入していないケース
+			charge_call += no_serv;
 		}else if (yes_c1 == true && yes_e1 == false){
+			//C1にのみ加入しているケース
 			if (nums_c1.contains(num_call)){;
+				//通話先が割引対象であるケース
 				charge_call += callcharge/2*time_call;
 			}else {
-				charge_call += callcharge*time_call;	//重複してる2
+				//通話先が割引対象でないケース
+				charge_call += no_serv;
 			}
 		}else if (yes_c1 == false && yes_e1 == true){
+			//加入者がE1にのみ加入しているケース
 			if (time_start > 759 && time_start < 1800){		//時間帯の条件としてクラス変数にしてもいいかも?
+				//通話開始時間が割引対象であるケース
 				charge_call += (int) (callcharge-e1discount)*time_call;		//とりあえずキャストで切り捨てをしている。要修正
 			}else{
-				charge_call += callcharge*time_call;	//重複してる3
+				//通話開始時間が割引対象でないケース
+				charge_call += no_serv;
 			}
 		}else if (yes_c1 == true && yes_e1 == true){
+			//加入者がC1・E1に加入しているケース
 			if (time_start > 759 && time_start < 1800 && nums_c1.contains(num_call)){
+				//通話先が割引対象である、かつ通話開始時間が割引対象であるケース
 				charge_call += (int) (callcharge-e1discount)/2*time_call;	//とりあえずキャストで切りすてしているが、修正したほうがよい
 			}else if (time_start > 759 && time_start < 1800 && !(nums_c1.contains(num_call))){
+				///通話先が割引対象でない,かつ通話開始時間が割引対象であるケース
 				charge_call += (int) (callcharge-e1discount)*time_call;				//キャスト
 			}else if (!(time_start > 759 && time_start < 1800) && nums_c1.contains(num_call)){
+				//通話先が割引対象である、かつ通話開始時間が割引対象でないケース
 				charge_call += (int) callcharge/2*time_call;
 			}else {
-				charge_call += callcharge*time_call;	//重複してる4
+				//通話先が割引対象出ない、かつ通話開始時間が割引対象でないケース
+				charge_call += no_serv;
 			}
 		}
 		return charge_call;
 	}
-
-	static void calcE1(){
-		int e1_Extra;
-		int e1_Range;
-	}
-
 }
