@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class ConvertFile {
 
 		//共通
-		static String dirpath = "C:\\KM_Person\\pleiades-4.6.3-ultimate-win-64bit-jre_20170422\\pg_ex21\\src\\pg_ex21\\";
+		static String dirpath = "C:/KM_Person/pleiades-4.6.3-ultimate-win-64bit-jre_20170422/pg_ex21/src/pg_ex21/";
 		static String recordname = dirpath +"record.log";
 		static String reqfilename =dirpath +"invoice.dat";
 		static int basecharge = 1000;	//基本料金
