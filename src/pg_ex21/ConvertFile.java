@@ -15,8 +15,8 @@ public class ConvertFile {
 		static int basecharge = 1000;	//基本料金
 		static int callcharge = 20;	//通話料金(1分毎)
 		static int e1discount = 5;		//E1サービスにて適用される割引料金(分あたり)
-
-		static String secline = "====================";
+		static int c1start = 759;		//C1サービス適用開始時間
+		static int c1end = 1800;		//C1サービス適用終了時間
 
 	public static void main(String[] args) throws IOException{ //メソッド名は後で変更する
 		File record =  new File(recordname);
@@ -80,7 +80,7 @@ public class ConvertFile {
 				bw.write("1 "+phone_num+"\n");
 				bw.write("5 "+sum_base_charge+"\n");
 				bw.write("7 "+sum_charge_call+"\n");
-				bw.write("9 "+secline+"\n");
+				bw.write("9 "+"===================="+"\n");
 				}
 
 				//変数、配列の初期化
@@ -129,7 +129,7 @@ public class ConvertFile {
 			}
 		}else if (yes_c1 == false && yes_e1 == true){
 			//加入者がE1にのみ加入しているケース
-			if (time_start > 759 && time_start < 1800){		//時間帯の条件としてクラス変数にしてもいいかも?
+			if (time_start > c1start && time_start < c1end){		//時間帯の条件としてクラス変数にしてもいいかも?
 				//通話開始時間が割引対象であるケース
 				charge_call += (int) (callcharge-e1discount)*time_call;		//とりあえずキャストで切り捨てをしている。要修正
 			}else{
@@ -138,13 +138,13 @@ public class ConvertFile {
 			}
 		}else if (yes_c1 == true && yes_e1 == true){
 			//加入者がC1・E1に加入しているケース
-			if (time_start > 759 && time_start < 1800 && nums_c1.contains(num_call)){
+			if (time_start > c1start && time_start < c1end && nums_c1.contains(num_call)){
 				//通話先が割引対象である、かつ通話開始時間が割引対象であるケース
 				charge_call += (int) (callcharge-e1discount)/2*time_call;	//とりあえずキャストで切りすてしているが、修正したほうがよい
-			}else if (time_start > 759 && time_start < 1800 && !(nums_c1.contains(num_call))){
+			}else if (time_start > c1start && time_start < c1end && !(nums_c1.contains(num_call))){
 				///通話先が割引対象でない,かつ通話開始時間が割引対象であるケース
 				charge_call += (int) (callcharge-e1discount)*time_call;				//キャスト
-			}else if (!(time_start > 759 && time_start < 1800) && nums_c1.contains(num_call)){
+			}else if (!(time_start > c1start && time_start < c1end) && nums_c1.contains(num_call)){
 				//通話先が割引対象である、かつ通話開始時間が割引対象でないケース
 				charge_call += (int) callcharge/2*time_call;
 			}else {
