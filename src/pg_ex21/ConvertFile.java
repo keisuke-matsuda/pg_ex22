@@ -9,18 +9,28 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class ConvertFile {
+
+		//共通
 		static String dirpath = "C:\\KM_Person\\pleiades-4.6.3-ultimate-win-64bit-jre_20170422\\pg_ex21\\src\\pg_ex21\\";
 		static String recordname = dirpath +"record.log";
 		static String reqfilename =dirpath +"invoice.dat";
 		static int basecharge = 1000;	//基本料金
 		static int callcharge = 20;	//通話料金(1分毎)
+
+		//C1サービスに関する値
+		static int c1extra = 100;		//C1サービスにて適用される基本料金への割り増し料金
+		static int c1start = 800;		//C1サービス適用開始時間
+		static int c1end = 1759;		//C1サービス適用終了時間
+
+		//E1サービスに関する値
+		static int e1extra = 200;		//E1サービスにて適用される基本料金への割り増し料金
 		static int e1discount = 5;		//E1サービスにて適用される割引料金(分あたり)
-		static int c1start = 759;		//C1サービス適用開始時間
-		static int c1end = 1800;		//C1サービス適用終了時間
+
 
 	public static void main(String[] args) throws IOException{ //メソッド名は後で変更する
 		File record =  new File(recordname);
 		BufferedReader br = new BufferedReader(new FileReader(record));
+
 		File reqfile = new File(reqfilename);
 		BufferedWriter bw = new BufferedWriter(new FileWriter(reqfile,true));
 
@@ -102,7 +112,8 @@ public class ConvertFile {
 		int charge_base = basecharge;
 		if (yes_c1 == true){
 			charge_base += 100;
-		}else if (yes_e1 == true){
+		}
+		if (yes_e1 == true){
 			charge_base += 200;
 		}
 		return charge_base;

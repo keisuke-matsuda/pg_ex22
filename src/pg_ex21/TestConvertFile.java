@@ -47,10 +47,10 @@ public class TestConvertFile {
 		assertEquals(70,charge_both_1);
 
 		int charge_both_2 = ConvertFile.calcCall(true, true,850,10, "090-8596-7102", nums_c1);
-		assertEquals(100,charge_both_2);
+		assertEquals(150,charge_both_2);
 
 		int charge_both_3 = ConvertFile.calcCall(true, true,2000,10, "090-8596-7103", nums_c1);
-		assertEquals(150,charge_both_3);
+		assertEquals(100,charge_both_3);
 
 	}
 
